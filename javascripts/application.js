@@ -61,7 +61,7 @@ function init() {
     var legend = new Legend('#legend', [
       {color: "rgba(198, 60, 9, .50)", label: "Earthquakes", rounded: true},
       {color: "rgba(73, 188, 239, .50)", label: "Cities", rounded: true},
-      {color: "rgba(0, 0, 0, .25)", label: "Boreholes", rounded: true},
+      {color: "rgba(0, 0, 0, .75)", label: "Boreholes", rounded: true},
       {color: "rgba(0, 0, 0, .25)", label: "Gasfields", rounded: false}
     ]);
 
