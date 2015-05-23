@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Timeline with scaled markers</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+<!-- This example requires d3 for AJAX and the brush,
+     though you can bring your own library. -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.6/d3.min.js' charset="utf-8"></script>
+<style>
+.ui-brush {
+  background:#f8f8f8;
+  position:absolute;
+  bottom:0;right:0;left:0;
+  height:100px;
+  }
+.brush .extent {
+  stroke:#fff;
+  fill-opacity:0.125;
+  shape-rendering:crispEdges;
+  }
+</style>
+
+<div id='map' class='dark'>
+    <div id="earthquakes"></div>
+
+</div>
+<div id='brush' class='ui-brush'></div>
+
+<script>
+// L.mapbox.accessToken = 'pk.eyJ1IjoiYm91a2UiLCJhIjoiN2hRM0xRayJ9.EBa5HOntkvFLFYp_IbyG3w';
+// var map = L.mapbox.map('map', 'mapbox.satellite')
+//     .setView([0, 0], 1);
+
+// Create a new layer with a special pointToLayer function
+// that'll generate scaled points.
+// var earthquakesLayer = L.geoJson(null, { pointToLayer: scaledPoint })
+//     .addTo(map);
+
+function pointColor(feature) {
+    return feature.properties.mag > 5 ? '#f55' : '#a00';
+}
+
+function pointRadius(feature) {
+    return feature.properties.mag * 1;
+}
+
+function scaledPoint(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: pointRadius(feature),
+        fillColor: pointColor(feature),
+        fillOpacity: 0.7,
+        weight: 0.5,
+        color: '#fff'
+    }).bindPopup(
+        '<h2>' + feature.properties.location + '</h2>' +
+        '<h3>' + new Date(feature.properties.date) + '</h3>' +
+        feature.properties.mag + ' magnitude');
+}
+
+// Request our data and add it to the earthquakesLayer.
+d3.json('earthquakes.geojson', function(err, data) {
+    // earthquakesLayer.addData(data);
+    earthquakes_callback(data);
+    // setBrush(data);
+});
+
+var xy = d3.geo.mercator();
+        xy.scale(20000);
+        xy.center([5.2,53.2]);
+
+
+// must be named this way to match earthquake feed
+function earthquakes_callback(data) {
+
+    var svg = d3.select("#earthquakes")
+
+    // var updated = new Date(data.metadata.generated);
+    // var format = d3.time.format("%I:%M:%S %p");
+
+    // d3.select("#time").text(format(updated));
+
+    // console.log("Currently: " + format(new Date()) + ", " +
+    //     "Last Generated: " + format(updated));
+
+    // handling updates are difficult
+    // http://bost.ocks.org/mike/join/
+    // http://bl.ocks.org/mbostock/3808234
+
+    // get any existing circles
+    var quakes = svg.selectAll("circle").data(data.features)
+
+    var radius = d3.scale.pow()
+        .range([2, 12])
+        .domain([0, 10]);
+
+    // add new circles for new earthquakes
+    
+    quakes.enter()
+        .append("circle")
+        .attr("cx", function(d) {
+            return xy(d.geometry.coordinates)[0]
+        })
+        .attr("cy", function(d) {
+            return xy(d.geometry.coordinates)[1]
+        })
+        .attr("r", function(d) {
+            return 0;
+        })
+        .style("fill", "red")
+        .style("fill-opacity", 0)
+        .style("stroke", "red")
+        .style("stroke-width", "0.5px")
+        .style("stroke-opacity", 1)
+        .transition()
+        .delay(function(d, i) {
+            return i / data.features.length * 1000;
+        })
+        .duration(1000)
+        .attr("r", function(d) {
+            return radius(d.properties.mag);
+        })
+        .style("fill-opacity", 0.25);
+
+    // remove circles for old earthquakes no longer in data
+    quakes.exit()
+        .transition()
+        .attr("r", 0)
+        .style("fill-opacity", 0)
+        .remove();
+}
+
+function setBrush(data) {
+    var container = d3.select('#brush'),
+        width = container.node().offsetWidth,
+        margin = {top: 0, right: 0, bottom: 0, left: 0},
+        height = 100;
+
+    var timeExtent = d3.extent(data.features, function(d) {
+        return new Date(d.properties.date);
+    });
+
+    var svg = container.append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom);
+
+    var context = svg.append('g')
+        .attr('class', 'context')
+        .attr('transform', 'translate(' +
+            margin.left + ',' +
+            margin.top + ')');
+
+    var x = d3.time.scale()
+        .range([0, width])
+        .domain(timeExtent);
+
+    var brush = d3.svg.brush()
+        .x(x)
+        .on('brushend', brushend);
+
+    context.selectAll('circle.quake')
+        .data(data.features)
+        .enter()
+        .append('circle')
+        .attr('transform', function(d) {
+            return 'translate(' + [x(new Date(d.properties.date)), height / 2] + ')';
+        })
+        .attr('r', pointRadius)
+        .attr('opacity', 0.5)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 0.5)
+        .attr('fill', pointColor);
+
+    context.append('g')
+        .attr('class', 'x brush')
+        .call(brush)
+        .selectAll('rect')
+        .attr('y', -6)
+        .attr('height', height);
+
+    function brushend() {
+        var filter;
+            // If the user has selected no brush area, share everything.
+        if (brush.empty()) {
+            filter = function() { return true; }
+        } else {
+            // Otherwise, restrict features to only things in the brush extent.
+            filter = function(feature) {
+                return feature.properties.date > +brush.extent()[0] &&
+                    feature.properties.date < (+brush.extent()[1]);
+            };
+        }
+        var filtered = data.features.filter(filter);
+        earthquakesLayer.clearLayers()
+            .addData(filtered);
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "data-visualisation",
+  "version": "0.0.1",
+  "homepage": "",
+  "authors": [
+    "Bouke Regnerus <b.regnerus@student.utwente.nl >",
+    "Rick van Gemert <r.vangemert@student.utwente.nl >"
+  ],
+  "description": "",
+  "keywords": [],
+  "license": "All rights reserved",
+  "main": "./index.js",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "./app",
+    "./public",
+    "./source",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "compass-*/*.rb"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "d3": "~3.5.5"
+  }
+}
