@@ -1,67 +1,110 @@
 var width               = window.screen.width;
-var height              = window.screen.height;
+var height              = window.screen.height;    
 
-// var svg             = d3.select("body")
-//                         .append("svg");
-
-var mapContainer        = d3.select('#map'),
-                            width   = width,
-                            margin  = {top: 0, right: 0, bottom: 0, left: 0},
-                            height   = height - 100;
-
-var mapSvg              = mapContainer.append('svg')
-                            .attr('width', width + margin.left + margin.right)
-                            .attr('height', height + margin.top + margin.bottom);
-                            // .call(d3.behavior.zoom()
-                            // .on("zoom", redraw));
-
-var xy                  = mapSvg.projection = d3.geo.mercator()
+var xy                  = d3.geo.mercator()
                             .scale(8000)
                             .translate([width/2, height/2])
                             .center([5.8,52]);
 
-var map                 = mapSvg.append("g").attr("id", "map");
-var gasfields           = mapSvg.append("g").attr("id", "gasfields");
-var locations           = mapSvg.append("g").attr("id", "places");
-var boreholes           = mapSvg.append("g").attr("id", "places");
-var earthquakes         = mapSvg.append("g").attr("id", "earthquakes");
+var scale               = 1;
+var prevScale           = 1;
+var scaleFunc           = d3.scale.linear()
+                            .range([1, .5])
+                            .domain([1, 8]);
 
-
-
-
-
-var brushContainer      = d3.select('#brush'),
-                            width = width,
-                            margin = {top: 0, right: 0, bottom: 0, left: 0},
-                            height = 100;
-
-var brushSvg            = brushContainer.append('svg')
-                            .attr('width', width + margin.left + margin.right)
-                            .attr('height', height + margin.top + margin.bottom);
-
-var brushes             = brushSvg.append('g')
-                            .attr('class', 'context')
-                            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+function range(min, max) {
+    return [Math.round(min * scale), Math.round(max * scale)];
+}
 
 var path                = d3.geo.path();
 
-d3.json('earthquakes.geojson', function(err, data) {
-    EarthquakesFunction(data.features);
-    setBrush(data.features);
-});
+var main, map, data;
 
-d3.json('places.geojson', function(err, data) {
-    PlacesFunction(data.features);
-});
+function init() {
 
-d3.json('gasfields.geojson', function(err, data) {
-    GasfieldsFunction(data.features);
-});
+    var zoom                = d3.behavior.zoom()
+                                .scaleExtent([1, 8])
+                                .on("zoom", move);
 
-d3.json('boreholes.geojson', function(err, data) {
-    BoreholesFunction(data.features);
-});
+        main                = d3.select('#map').append('svg')
+                                .call(zoom)
+                                .append("g");
 
-function redraw() {
-    mapSvg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+        map                 = {
+                                'gasfields'     : main.append("g").attr("id", "gasfields"),
+                                'places'        : main.append("g").attr("id", "places"),
+                                'boreholes'     : main.append("g").attr("id", "boreholes"),
+                                'earthquakes'   : main.append("g").attr("id", "earthquakes"),
+                            }
+
+    var brush               = d3.select('#brush').append('svg')
+                                .attr('width', width)
+                                .attr('height', 100)
+                                .append('g');
+
+    setBrush(data.earthquakes, brush);
+
+    draw();
+}
+
+function draw() {
+    prevScale = scale;
+    for(var name in map) {
+        main.select('#' + name).selectAll("*").remove();
+    }
+
+    drawEarthquakes(data.earthquakes, map.earthquakes);
+
+    drawPlaces(data.places.filter(function(d) {
+        return d.properties.population > 500;
+    }), map.places);
+
+    drawGasfields(data.gasfields, map.gasfields);
+
+    drawBoreholes(data.boreholes, map.boreholes);
+}
+
+queue()
+    .defer(request, "./datasets/earthquakes.geojson")
+    .defer(request, "./datasets/places.geojson")
+    .defer(request, "./datasets/gasfields.geojson")
+    .defer(request, "./datasets/boreholes.geojson")
+    .await(function(error, earthquakes, places, gasfields, boreholes) { 
+        data = {
+            'earthquakes': earthquakes,
+            'places': places,
+            'gasfields': gasfields,
+            'boreholes': boreholes,
+        }
+
+        init(data);
+    });
+
+function request(url, callback) {
+    d3.json(url, function(err, data) {
+        if(!err) {
+            callback(null, data.features);
+        }
+        else {
+            callback(err);
+        }
+    });
+}
+
+var throttleTimer;
+function throttle() {
+  window.clearTimeout(throttleTimer);
+    throttleTimer = window.setTimeout(function() {
+        draw();
+    }, 100);
+}
+
+function move() {
+    main.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    scale = scaleFunc(d3.event.scale);
+
+    if(prevScale !== scale) {
+        console.log(scale);
+        throttle();
+    }  
 }

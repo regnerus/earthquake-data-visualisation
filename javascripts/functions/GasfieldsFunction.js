@@ -1,6 +1,6 @@
-function GasfieldsFunction(data) {
+function drawGasfields(dataset, map) {
     // get any existing circles
-    var fields = gasfields.selectAll("path").data(data)
+    var gasfields = map.selectAll("path").data(dataset)
 
     var radius = d3.scale.pow()
         .range([2, 12])
@@ -8,7 +8,7 @@ function GasfieldsFunction(data) {
 
     // add new circles for new earthquakes
     
-    fields.enter()
+    gasfields.enter()
         .append("path")
         .attr("d", path.projection(xy))
 

@@ -1,8 +1,12 @@
-function BoreholesFunction(data) {
+function drawBoreholes(dataset, map) {
     // get any existing circles
-    var holes = boreholes.selectAll("circle").data(data)
+    var boreholes = map.selectAll("circle").data(dataset)
 
-    holes.enter()
+    var radius = d3.scale.linear()
+        .range(range(2, 2))
+        .domain([1, 1]);
+
+    boreholes.enter()
         .append("circle")
         .attr("cx", function(d) {
             return xy(d.geometry.coordinates)[0]
@@ -17,16 +21,19 @@ function BoreholesFunction(data) {
         .style("fill-opacity", 0)
         .transition()
         .delay(function(d, i) {
-            return i / data.length * 1000;
+            return i / dataset.length * 1000;
         })
         .duration(1000)
         .attr("r", function(d) {
             return 2;
         })
+        .attr("r", function(d) {
+            return radius(1);
+        })
         .style("fill-opacity", 0.25);
 
     // remove circles for old earthquakes no longer in data
-    holes.exit()
+    boreholes.exit()
         .transition()
         .attr("r", 0)
         .style("fill-opacity", 0)

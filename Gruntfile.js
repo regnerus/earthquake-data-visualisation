@@ -31,6 +31,7 @@ module.exports = function(grunt) {
 					 *	Include D3.js
 					 */
 					'./bower_components/d3/d3.min.js',
+					'./bower_components/queue-async/queue.min.js',
 
 					/*
 					 *	Include JS files

@@ -1,26 +1,24 @@
-function setBrush(data) {
-    // var container = d3.select('#brush'),
-    //     width = container.node().offsetWidth,
-    //     margin = {top: 0, right: 0, bottom: 0, left: 0},
-    //     height = 100;
-
-    var timeExtent = d3.extent(data, function(d) {
+function setBrush(dataset, svg) {
+    var timeExtent = d3.extent(dataset, function(d) {
         return new Date(d.properties.date);
     });
 
-    var radius = d3.scale.pow()
-        .range([2, 12])
-        .domain([0, 5]);
+    var height = 100;
 
-    // var svg = container.append('svg')
-    //     .attr('width', width + margin.left + margin.right)
-    //     .attr('height', height + margin.top + margin.bottom);
+    var radius = d3.scale.linear()
+        .range(range(1, 10))
+        .domain([0, 3]);
 
-    // var context = svg.append('g')
-    //     .attr('class', 'context')
-    //     .attr('transform', 'translate(' +
-    //         margin.left + ',' +
-    //         margin.top + ')');
+    var colourScale = d3.scale.linear()
+        .range([0, 1])
+        .domain([0, 3]);
+
+    var fillOpacity = d3.scale.linear()
+        .range([0, .5])
+        .domain([0, 3]);
+
+    var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
+                   //colours can be specified as any CSS colour string
 
     var x = d3.time.scale()
         .range([0, width])
@@ -30,22 +28,34 @@ function setBrush(data) {
         .x(x)
         .on('brushend', brushend);
 
-    brushes.selectAll('circle.quake')
-        .data(data)
+
+    svg.selectAll('circle.quake')
+        .data(dataset)
         .enter()
         .append('circle')
         .attr('transform', function(d) {
             return 'translate(' + [x(new Date(d.properties.date)), height / 2] + ')';
         })
         .attr("r", function(d) {
-            return radius(d.properties.mag);
+            return 0;
         })
-        .attr('opacity', 0.5)
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 0.5)
-        .attr('fill', 'red');
+        .style("fill", function(d) {
+            return colourInterpolator(colourScale(Math.abs(d.properties.mag)));
+        })
+        .style("fill-opacity", 0)
+        .transition()
+        .delay(function(d, i) {
+            return i / dataset.length * 1000;
+        })
+        .duration(1000)
+        .attr("r", function(d) {
+            return radius(Math.abs(d.properties.mag));
+        })
+        .style("fill-opacity", function(d) {
+            return fillOpacity(Math.abs(d.properties.mag));
+        });
 
-    brushes.append('g')
+    svg.append('g')
         .attr('class', 'x brush')
         .call(brush)
         .selectAll('rect')
@@ -53,22 +63,35 @@ function setBrush(data) {
         .attr('height', height);
 
     function brushend() {
-        var filter;
+        var filterEarthquakes, filterGasfield, filterBoreholes;
             // If the user has selected no brush area, share everything.
         if (brush.empty()) {
-            filter = function() { return true; }
+            filterEarthquakes = function() { return true; }
+
+            filterGasfield = function() { return true; }
+
+            filterBoreholes = function() { return true; }
         } 
         else {
             // Otherwise, restrict features to only things in the brush extent.
-            filter = function(feature) {
+            filterEarthquakes = function(feature) {
                 return new Date(feature.properties.date) > +brush.extent()[0] &&
                     new Date(feature.properties.date) < (+brush.extent()[1]);
             };
 
-            console.log(filter);
-        }
-        var filtered = data.filter(filter);
+            filterGasfield = function(feature) {
+                return new Date(feature.properties.production) > +brush.extent()[1];
+            };
 
-        EarthquakesFunction(filtered);
+            filterBoreholes = function(feature) {
+                return new Date(feature.properties.start_date) >= +brush.extent()[0];
+            };
+        }
+
+        data.earthquakes = dataset.filter(filterEarthquakes);
+        // data.gasfields = data.gasfields.filter(filterGasfield);
+        // data.boreholes = data.boreholes.filter(filterBoreholes);
+
+        drawEarthquakes(data.earthquakes, map.earthquakes);
     }
 }
