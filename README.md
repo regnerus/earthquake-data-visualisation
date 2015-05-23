@@ -1,7 +1,7 @@
 Data visualisation for Creative Technology Data Visualisation Course by Rick van Gemert and Bouke Regnerus. Created in D3.js (http://d3js.org/).
 
 
-*View this data visualisation (http://regnerus.github.io/data-visualisation).*
+**View this data visualisation (http://regnerus.github.io/data-visualisation).**
 
 ---
 
