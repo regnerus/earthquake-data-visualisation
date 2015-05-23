@@ -85,7 +85,7 @@ function setBrush(dataset, svg) {
 
     svg.append("g")
         .attr("class", "axis axis--y")
-        .attr("transform", "translate(20,0)")
+        .attr("transform", "translate(30,0)")
         .call(
             d3.svg.axis()
             .scale(y)

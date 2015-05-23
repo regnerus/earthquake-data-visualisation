@@ -42,9 +42,9 @@ h1 {
   	margin: 4rem auto;
 }
 
-#map svg { 
+#map svg,
+#brush svg  { 
 	position: absolute; 
-	top: 0; 
 	bottom: 0;
 	left: 0;
 	right: 0;
@@ -52,3 +52,12 @@ h1 {
 	height: 100%;
 }
 
+#map svg { 
+	top: 0; 
+	height: 100%;
+	
+}
+
+#brush svg {
+	height: 100px;
+}

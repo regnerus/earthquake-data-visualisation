@@ -52,7 +52,6 @@ function init() {
                             }
 
     var brush               = d3.select('#brush').append('svg')
-                                .attr('width', width)
                                 .attr('height', 100)
                                 .append('g');
 
