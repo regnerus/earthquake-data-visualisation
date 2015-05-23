@@ -24,6 +24,16 @@ function range(min, max) {
 
 var path                = d3.geo.path();
 
+var tooltip_place = d3.select("body")
+    .append("div")
+        .attr("class", "tooltip tooltip--place")
+        .style("opacity", 0);
+
+var tooltip_earthquake = d3.select("body")
+    .append("div")
+        .attr("class", "tooltip tooltip--earthquake")
+        .style("opacity", 0);
+
 var main, map, data;
 
 function init() {
@@ -33,6 +43,10 @@ function init() {
                                 .on("zoom", move);
 
         main                = d3.select('#map').append('svg')
+                                .on("click", function(d) {
+                                    tooltip_place = d3.select(".tooltip--place").style("opacity", 0);
+                                    tooltip_earthquake = d3.select(".tooltip--earthquake").style("opacity", 0);
+                                })
                                 .call(zoom)
                                 .append("g");
 
@@ -50,8 +64,21 @@ function init() {
 
     setBrush(data.earthquakes, brush);
 
+    var legend = new Legend('#legend', [
+      {color: "rgba(198, 60, 9, .50)", label: "Earthquakes", rounded: true},
+      {color: "rgba(73, 188, 239, .50)", label: "Cities", rounded: true},
+      {color: "rgba(0, 0, 0, .25)", label: "Boreholes", rounded: true},
+      {color: "rgba(0, 0, 0, .25)", label: "Gasfields", rounded: false}
+    ]);
+
+    legend.draw();
+
     draw();
 }
+
+window.onresize = function(event) {
+    draw();
+};
 
 function draw() {
     prevScale = scale;
@@ -62,7 +89,7 @@ function draw() {
     drawEarthquakes(data.earthquakes, map.earthquakes);
 
     drawPlaces(data.places.filter(function(d) {
-        return d.properties.population > 500;
+        return d.properties.population > 1000;
     }), map.places);
 
     drawGasfields(data.gasfields, map.gasfields);
@@ -106,6 +133,9 @@ function throttle() {
 }
 
 function move() {
+    tooltip_place = d3.select(".tooltip--place").style("opacity", 0);
+    tooltip_earthquake = d3.select(".tooltip--earthquake").style("opacity", 0);
+
     main.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     scale = scaleFunc(d3.event.scale);
 
@@ -142,12 +172,9 @@ function drawBoreholes(dataset, map) {
         })
         .duration(1000)
         .attr("r", function(d) {
-            return 2;
-        })
-        .attr("r", function(d) {
             return radius(1);
         })
-        .style("fill-opacity", 0.2);
+        .style("fill-opacity", 0.25);
 
     // remove circles for old earthquakes no longer in data
     boreholes.exit()
@@ -164,16 +191,16 @@ function setBrush(dataset, svg) {
     var height = 100;
 
     var radius = d3.scale.linear()
-        .range(range(1, 20))
-        .domain([0, 3]);
+        .range(range(1, 50))
+        .domain([0, 5]);
 
     var colourScale = d3.scale.linear()
         .range([0, 1])
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var fillOpacity = d3.scale.linear()
         .range([0, .5])
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
                    //colours can be specified as any CSS colour string
@@ -183,7 +210,7 @@ function setBrush(dataset, svg) {
         .domain(timeExtent);
 
     var y = d3.scale.linear()
-        .domain([-3, 3])
+        .domain([-5, 5])
         .range([0, height]);
 
     var brush = d3.svg.brush()
@@ -219,7 +246,7 @@ function setBrush(dataset, svg) {
         .call(
             d3.svg.axis()
             .scale(y)
-            .ticks(5)
+            .ticks(10)
             .orient("left")
             .tickSize(-width)
         )
@@ -267,7 +294,7 @@ function setBrush(dataset, svg) {
         .style("fill-opacity", 0)
         .transition()
         .delay(function(d, i) {
-            return i / dataset.length * 1000;
+            return i / dataset.length * 2000;
         })
         .duration(1000)
         .attr("r", function(d) {
@@ -284,18 +311,9 @@ function setBrush(dataset, svg) {
         .attr('height', height);
 
     function brushend() {
-        // var xRange = d3.time.scale()
-        // .range([0, width])
-        // .domain(brush.extent);
         if (!d3.event.sourceEvent) return; // only transition after input
         var extent0 = brush.extent(),
-        extent1 = extent0.map(d3.time.year.round);
-
-        // if empty when rounded, use floor & ceil instead
-        if (extent1[0] >= extent1[1]) {
-            extent1[0] = d3.time.year.floor(extent0[0]);
-            extent1[1] = d3.time.year.ceil(extent0[1]);
-        }
+            extent1 = extent0.map(d3.time.year.round);
 
         d3.select(this).transition()
         .call(brush.extent(extent1))
@@ -339,15 +357,15 @@ function drawEarthquakes(dataset, map) {
 
     var radius = d3.scale.linear()
         .range(range(1, 10))
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var colourScale = d3.scale.linear()
         .range([0, 1])
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var fillOpacity = d3.scale.linear()
         .range([0, .5])
-        .domain([0, 3]);
+        .domain([0, 5]);
                     
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
                    //colours can be specified as any CSS colour string
@@ -365,13 +383,26 @@ function drawEarthquakes(dataset, map) {
         .attr("r", function(d) {
             return 0;
         })
+        .on("mouseover", function(d) {
+            tooltip_place = d3.select(".tooltip--place").style("opacity", 0);
+              
+            tooltip_earthquake.transition()
+                .duration(500)  
+                .style("opacity", 0);
+            tooltip_earthquake.transition()
+                .duration(200)  
+                .style("opacity", .9);  
+            tooltip_earthquake.html(d.properties.location + " <span class=\"magnitude\">" + d.properties.mag + "</span> <span class=\"date\">" + new Date(d.properties.date).toDateString()+ "</span>")
+                .style("left", (d3.event.pageX) + "px")          
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
         .style("fill", function(d) {
             return colourInterpolator(colourScale(Math.abs(d.properties.mag)));
         })
         .style("fill-opacity", 0)
         .transition()
         .delay(function(d, i) {
-            return i / dataset.length * 1000;
+            return i / dataset.length * 2000;
         })
         .duration(1000)
         .attr("r", function(d) {
@@ -403,23 +434,79 @@ function drawGasfields(dataset, map) {
         .attr("d", path.projection(xy))
 
         .style("fill", "black")
-        .style("fill-opacity", .25)
-        // .transition()
-        // .delay(function(d, i) {
-        //     return i / data.features.length * 1000;
-        // })
-        // .duration(1000)
-        // .attr("r", function(d) {
-        //     return radius(d.properties.mag);
-        // })
-        // .style("fill-opacity", 0.25);
+        .style("fill-opacity", 0)
+        .transition()
+        .delay(function(d, i) {
+            return i / dataset.length * 1000;
+        })
+        .duration(1000)
+        .style("fill-opacity", .15)
 
-    // // remove circles for old earthquakes no longer in data
-    // quakes.exit()
-    //     .transition()
-    //     .attr("r", 0)
-    //     .style("fill-opacity", 0)
-    //     .remove();
+    // remove circles for old earthquakes no longer in data
+    gasfields.exit()
+        .transition()
+        .style("fill-opacity", 0)
+        .remove();
+};
+var Legend = function(el, series) {
+  this.el = d3.select(el);
+  this.series = series;
+};
+
+Legend.prototype.update = function(series, animate) {
+  this.series = series;
+  
+  var item = this.el
+    .selectAll(".shart-legend-item")
+      .data(series);
+  
+  var exit = item.exit();
+  
+  var enter = item.enter()
+    .append("div")
+      .classed("shart-legend-item", true);
+  
+  var swatch = enter.append("span")
+    .classed("shart-swatch shart-legend-item-swatch", true)
+    .style("background-color", function(d) { return d.color })
+    .style("border-radius", function(d) { 
+      if(d.rounded) {
+        return '50%';
+      }
+      else {
+        return '0'; 
+      }
+      
+    });
+
+  var label = enter.append("span")
+    .classed("shart-legend-item-label", true)
+    .text(function(d) { return d.label });
+  
+  if (animate) {
+    exit
+      .transition()
+        .style('opacity', 0)
+        .remove();
+    
+    enter
+      .style('opacity', 0)
+      .transition()
+        .duration(1000)
+        .style('opacity', 1);
+    
+  } else {
+    exit
+      .remove();
+  }
+
+};
+
+Legend.prototype.draw = function() {
+  this.el
+    .classed("shart-legend", true);
+
+  this.update(this.series);
 };
 function drawPlaces(dataset, map) {
 
@@ -427,16 +514,16 @@ function drawPlaces(dataset, map) {
     var places = map.selectAll("circle").data(dataset)
     
     var radius = d3.scale.linear()
-        .range(range(2, 10))
-        .domain([0, 1000000]);
+        .range(range(2, 15))
+        .domain([1000, 1000000]);
 
     var colourScale = d3.scale.linear()
         .range([0, 1])
-        .domain([0, 1000000]);
+        .domain([1000, 1000000]);
 
     var fillOpacity = d3.scale.linear()
-        .range([0, .75])
-        .domain([0, 5000]);
+        .range([.50, .75])
+        .domain([1000, 1000000]);
                     
     var colourInterpolator = d3.interpolateHsl("#49BCEF", "#1E6787");
                    //colours can be specified as any CSS colour string
@@ -452,16 +539,26 @@ function drawPlaces(dataset, map) {
         .attr("r", function(d) {
             return 0;
         })
+        .on("mouseover", function(d) {   
+            tooltip_earthquake = d3.select(".tooltip--earthquake").style("opacity", 0);
+               
+            tooltip_place.transition()
+                .duration(500)  
+                .style("opacity", 0);
+            tooltip_place.transition()
+                .duration(200)  
+                .style("opacity", .9);  
+            tooltip_place.html(d.properties.name)
+                .style("left", (d3.event.pageX) + "px")          
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
         .style("fill", function(d) {
             return colourInterpolator(colourScale(Math.abs(d.properties.population)));
         })
         .style("fill-opacity", 0)
-        // .style("stroke", "blue")
-        // .style("stroke-width", "0.5px")
-        // .style("stroke-opacity", 1)
         .transition()
         .delay(function(d, i) {
-            return i / dataset.length * 1000;
+            return i / dataset.length * 200;
         })
         .duration(1000)
         .attr("r", function(d) {

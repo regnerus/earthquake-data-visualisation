@@ -1,9 +1,25 @@
+@import 'tooltip';
+
+@import 'axis';
+
+@import 'legend';
+
+@import 'open-sans';
+
 body {
 	background:white;
 	margin: 0; padding: 0;
 	height: 100%; width: 100%;
 	overflow: hidden;
-	font: 10px sans-serif;
+	font-family: 'Open Sans';
+	font-size: 12px;
+}
+
+h1 {
+	text-align: center;
+	font-weight: 400;
+	font-size: 32px;
+	z-index: 10;
 }
 
 #map svg { 
@@ -16,6 +32,3 @@ body {
 	height: 100%;
 }
 
-@import 'tooltip';
-
-@import 'axis';

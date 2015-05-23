@@ -6,16 +6,16 @@ function setBrush(dataset, svg) {
     var height = 100;
 
     var radius = d3.scale.linear()
-        .range(range(1, 20))
-        .domain([0, 3]);
+        .range(range(1, 50))
+        .domain([0, 5]);
 
     var colourScale = d3.scale.linear()
         .range([0, 1])
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var fillOpacity = d3.scale.linear()
         .range([0, .5])
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
                    //colours can be specified as any CSS colour string
@@ -25,7 +25,7 @@ function setBrush(dataset, svg) {
         .domain(timeExtent);
 
     var y = d3.scale.linear()
-        .domain([-3, 3])
+        .domain([-5, 5])
         .range([0, height]);
 
     var brush = d3.svg.brush()
@@ -61,7 +61,7 @@ function setBrush(dataset, svg) {
         .call(
             d3.svg.axis()
             .scale(y)
-            .ticks(5)
+            .ticks(10)
             .orient("left")
             .tickSize(-width)
         )
@@ -109,7 +109,7 @@ function setBrush(dataset, svg) {
         .style("fill-opacity", 0)
         .transition()
         .delay(function(d, i) {
-            return i / dataset.length * 1000;
+            return i / dataset.length * 2000;
         })
         .duration(1000)
         .attr("r", function(d) {
@@ -126,18 +126,9 @@ function setBrush(dataset, svg) {
         .attr('height', height);
 
     function brushend() {
-        // var xRange = d3.time.scale()
-        // .range([0, width])
-        // .domain(brush.extent);
         if (!d3.event.sourceEvent) return; // only transition after input
         var extent0 = brush.extent(),
-        extent1 = extent0.map(d3.time.year.round);
-
-        // if empty when rounded, use floor & ceil instead
-        if (extent1[0] >= extent1[1]) {
-            extent1[0] = d3.time.year.floor(extent0[0]);
-            extent1[1] = d3.time.year.ceil(extent0[1]);
-        }
+            extent1 = extent0.map(d3.time.year.round);
 
         d3.select(this).transition()
         .call(brush.extent(extent1))

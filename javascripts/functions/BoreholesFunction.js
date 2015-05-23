@@ -25,12 +25,9 @@ function drawBoreholes(dataset, map) {
         })
         .duration(1000)
         .attr("r", function(d) {
-            return 2;
-        })
-        .attr("r", function(d) {
             return radius(1);
         })
-        .style("fill-opacity", 0.2);
+        .style("fill-opacity", 0.25);
 
     // remove circles for old earthquakes no longer in data
     boreholes.exit()

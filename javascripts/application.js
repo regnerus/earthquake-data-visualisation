@@ -18,6 +18,16 @@ function range(min, max) {
 
 var path                = d3.geo.path();
 
+var tooltip_place = d3.select("body")
+    .append("div")
+        .attr("class", "tooltip tooltip--place")
+        .style("opacity", 0);
+
+var tooltip_earthquake = d3.select("body")
+    .append("div")
+        .attr("class", "tooltip tooltip--earthquake")
+        .style("opacity", 0);
+
 var main, map, data;
 
 function init() {
@@ -27,6 +37,10 @@ function init() {
                                 .on("zoom", move);
 
         main                = d3.select('#map').append('svg')
+                                .on("click", function(d) {
+                                    tooltip_place = d3.select(".tooltip--place").style("opacity", 0);
+                                    tooltip_earthquake = d3.select(".tooltip--earthquake").style("opacity", 0);
+                                })
                                 .call(zoom)
                                 .append("g");
 
@@ -44,8 +58,21 @@ function init() {
 
     setBrush(data.earthquakes, brush);
 
+    var legend = new Legend('#legend', [
+      {color: "rgba(198, 60, 9, .50)", label: "Earthquakes", rounded: true},
+      {color: "rgba(73, 188, 239, .50)", label: "Cities", rounded: true},
+      {color: "rgba(0, 0, 0, .25)", label: "Boreholes", rounded: true},
+      {color: "rgba(0, 0, 0, .25)", label: "Gasfields", rounded: false}
+    ]);
+
+    legend.draw();
+
     draw();
 }
+
+window.onresize = function(event) {
+    draw();
+};
 
 function draw() {
     prevScale = scale;
@@ -56,7 +83,7 @@ function draw() {
     drawEarthquakes(data.earthquakes, map.earthquakes);
 
     drawPlaces(data.places.filter(function(d) {
-        return d.properties.population > 500;
+        return d.properties.population > 1000;
     }), map.places);
 
     drawGasfields(data.gasfields, map.gasfields);
@@ -100,6 +127,9 @@ function throttle() {
 }
 
 function move() {
+    tooltip_place = d3.select(".tooltip--place").style("opacity", 0);
+    tooltip_earthquake = d3.select(".tooltip--earthquake").style("opacity", 0);
+
     main.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     scale = scaleFunc(d3.event.scale);
 

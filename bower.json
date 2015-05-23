@@ -25,6 +25,7 @@
   "dependencies": {},
   "devDependencies": {
     "d3": "~3.5.5",
-    "queue-async": "~1.0.7"
+    "queue-async": "~1.0.7",
+    "open-sans-fontface": "~1.4.0"
   }
 }

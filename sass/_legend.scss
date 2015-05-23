@@ -1,0 +1,35 @@
+#legend {
+  position: absolute;
+  right: 50px;
+  bottom: 150px;
+  padding: 10px 40px;
+  background: rgba(255,255,255, .8);
+  border: 1px dashed lightgray;
+  z-index: 10;
+
+  .shart-legend-item-label {
+    font-size: 14px;
+    margin-left: 4px;
+    line-height: 1;
+    vertical-align: middle;
+  }
+
+  .shart-swatch {
+    background: #444;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    overflow: hidden;
+    line-height: 1;
+  }
+
+  .shart-legend-item {
+    margin: 20px 0;
+  }
+
+  .shart-legend-item-swatch {
+    margin-right: 0.4em;
+  }
+}
+

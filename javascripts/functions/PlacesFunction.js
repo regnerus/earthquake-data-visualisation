@@ -4,16 +4,16 @@ function drawPlaces(dataset, map) {
     var places = map.selectAll("circle").data(dataset)
     
     var radius = d3.scale.linear()
-        .range(range(2, 10))
-        .domain([0, 1000000]);
+        .range(range(2, 15))
+        .domain([1000, 1000000]);
 
     var colourScale = d3.scale.linear()
         .range([0, 1])
-        .domain([0, 1000000]);
+        .domain([1000, 1000000]);
 
     var fillOpacity = d3.scale.linear()
-        .range([0, .75])
-        .domain([0, 5000]);
+        .range([.50, .75])
+        .domain([1000, 1000000]);
                     
     var colourInterpolator = d3.interpolateHsl("#49BCEF", "#1E6787");
                    //colours can be specified as any CSS colour string
@@ -29,16 +29,26 @@ function drawPlaces(dataset, map) {
         .attr("r", function(d) {
             return 0;
         })
+        .on("mouseover", function(d) {   
+            tooltip_earthquake = d3.select(".tooltip--earthquake").style("opacity", 0);
+               
+            tooltip_place.transition()
+                .duration(500)  
+                .style("opacity", 0);
+            tooltip_place.transition()
+                .duration(200)  
+                .style("opacity", .9);  
+            tooltip_place.html(d.properties.name)
+                .style("left", (d3.event.pageX) + "px")          
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
         .style("fill", function(d) {
             return colourInterpolator(colourScale(Math.abs(d.properties.population)));
         })
         .style("fill-opacity", 0)
-        // .style("stroke", "blue")
-        // .style("stroke-width", "0.5px")
-        // .style("stroke-opacity", 1)
         .transition()
         .delay(function(d, i) {
-            return i / dataset.length * 1000;
+            return i / dataset.length * 200;
         })
         .duration(1000)
         .attr("r", function(d) {

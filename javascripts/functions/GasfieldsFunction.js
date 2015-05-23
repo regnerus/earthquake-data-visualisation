@@ -13,21 +13,17 @@ function drawGasfields(dataset, map) {
         .attr("d", path.projection(xy))
 
         .style("fill", "black")
-        .style("fill-opacity", .25)
-        // .transition()
-        // .delay(function(d, i) {
-        //     return i / data.features.length * 1000;
-        // })
-        // .duration(1000)
-        // .attr("r", function(d) {
-        //     return radius(d.properties.mag);
-        // })
-        // .style("fill-opacity", 0.25);
+        .style("fill-opacity", 0)
+        .transition()
+        .delay(function(d, i) {
+            return i / dataset.length * 1000;
+        })
+        .duration(1000)
+        .style("fill-opacity", .15)
 
-    // // remove circles for old earthquakes no longer in data
-    // quakes.exit()
-    //     .transition()
-    //     .attr("r", 0)
-    //     .style("fill-opacity", 0)
-    //     .remove();
+    // remove circles for old earthquakes no longer in data
+    gasfields.exit()
+        .transition()
+        .style("fill-opacity", 0)
+        .remove();
 }

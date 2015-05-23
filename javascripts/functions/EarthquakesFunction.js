@@ -4,15 +4,15 @@ function drawEarthquakes(dataset, map) {
 
     var radius = d3.scale.linear()
         .range(range(1, 10))
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var colourScale = d3.scale.linear()
         .range([0, 1])
-        .domain([0, 3]);
+        .domain([0, 5]);
 
     var fillOpacity = d3.scale.linear()
         .range([0, .5])
-        .domain([0, 3]);
+        .domain([0, 5]);
                     
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
                    //colours can be specified as any CSS colour string
@@ -30,13 +30,26 @@ function drawEarthquakes(dataset, map) {
         .attr("r", function(d) {
             return 0;
         })
+        .on("mouseover", function(d) {
+            tooltip_place = d3.select(".tooltip--place").style("opacity", 0);
+              
+            tooltip_earthquake.transition()
+                .duration(500)  
+                .style("opacity", 0);
+            tooltip_earthquake.transition()
+                .duration(200)  
+                .style("opacity", .9);  
+            tooltip_earthquake.html(d.properties.location + " <span class=\"magnitude\">" + d.properties.mag + "</span> <span class=\"date\">" + new Date(d.properties.date).toDateString()+ "</span>")
+                .style("left", (d3.event.pageX) + "px")          
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
         .style("fill", function(d) {
             return colourInterpolator(colourScale(Math.abs(d.properties.mag)));
         })
         .style("fill-opacity", 0)
         .transition()
         .delay(function(d, i) {
-            return i / dataset.length * 1000;
+            return i / dataset.length * 2000;
         })
         .duration(1000)
         .attr("r", function(d) {
