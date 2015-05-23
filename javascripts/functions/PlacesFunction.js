@@ -46,6 +46,9 @@ function drawPlaces(dataset, map) {
         })
         .style("fill-opacity", function(d) {
             return fillOpacity(Math.abs(d.properties.population));
+        })
+        .attr("data-tooltip", function(d) { 
+            return d.properties.name; 
         });
 
     // remove circles for old earthquakes no longer in data

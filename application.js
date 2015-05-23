@@ -164,7 +164,7 @@ function setBrush(dataset, svg) {
     var height = 100;
 
     var radius = d3.scale.linear()
-        .range(range(1, 10))
+        .range(range(1, 20))
         .domain([0, 3]);
 
     var colourScale = d3.scale.linear()
@@ -389,6 +389,9 @@ function drawPlaces(dataset, map) {
         })
         .style("fill-opacity", function(d) {
             return fillOpacity(Math.abs(d.properties.population));
+        })
+        .attr("data-tooltip", function(d) { 
+            return d.properties.name; 
         });
 
     // remove circles for old earthquakes no longer in data
