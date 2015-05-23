@@ -3,7 +3,7 @@ function drawBoreholes(dataset, map) {
     var boreholes = map.selectAll("circle").data(dataset)
 
     var radius = d3.scale.linear()
-        .range(range(2, 2))
+        .range(range(1, 1))
         .domain([1, 1]);
 
     boreholes.enter()
@@ -30,7 +30,7 @@ function drawBoreholes(dataset, map) {
         .attr("r", function(d) {
             return radius(1);
         })
-        .style("fill-opacity", 0.25);
+        .style("fill-opacity", 0.2);
 
     // remove circles for old earthquakes no longer in data
     boreholes.exit()

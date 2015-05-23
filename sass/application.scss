@@ -3,6 +3,7 @@ body {
 	margin: 0; padding: 0;
 	height: 100%; width: 100%;
 	overflow: hidden;
+	font: 10px sans-serif;
 }
 
 #map svg { 
@@ -15,26 +16,6 @@ body {
 	height: 100%;
 }
 
-#brush svg { 
-	position: absolute; 
-	bottom: 0;
-	left: 0;
-	right: 0;
-	width: 100%; 
-	height: 100px;
-}
-
-.ui-brush {
-	background:#f8f8f8;
-	position:absolute;
-	bottom:0;right:0;left:0;
-	height:100px;
-}
-
-.brush .extent {
-	stroke:#fff;
-	fill-opacity:0.125;
-	shape-rendering:crispEdges;
-}
-
 @import 'tooltip';
+
+@import 'axis';
