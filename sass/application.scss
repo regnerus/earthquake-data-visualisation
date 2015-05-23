@@ -12,7 +12,8 @@ body {
 	height: 100%; width: 100%;
 	overflow: hidden;
 	font-family: 'Open Sans';
-	font-size: 12px;
+	font-size: 14px;
+	line-height: 1.5;
 }
 
 h1 {
@@ -33,6 +34,12 @@ h1 {
 	position: absolute;
 	left: 20px;
 	bottom: 120px;
+}
+
+#about {
+	max-width: 420px;
+	padding: 1rem;
+  	margin: 4rem auto;
 }
 
 #map svg { 
