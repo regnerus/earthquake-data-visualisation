@@ -6,7 +6,7 @@ function setBrush(dataset, svg) {
     var height = 100;
 
     var radius = d3.scale.linear()
-        .range(range(1, 50))
+        .range(range(0, 50))
         .domain([0, 5]);
 
     var colourScale = d3.scale.sqrt()

@@ -3,7 +3,7 @@ function drawEarthquakes(dataset, map) {
     var earthquakes = map.selectAll("circle").data(dataset);
 
     var radius = d3.scale.linear()
-        .range(range(1, 10))
+        .range(range(0, 10))
         .domain([0, 5]);
 
     var colourScale = d3.scale.sqrt()
