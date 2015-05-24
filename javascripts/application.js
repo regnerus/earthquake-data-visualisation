@@ -89,6 +89,8 @@ function draw() {
     drawGasfields(data.gasfields, map.gasfields);
 
     drawBoreholes(data.boreholes, map.boreholes);
+
+    console.log(data.earthquakes);
 }
 
 queue()

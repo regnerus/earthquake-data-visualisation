@@ -6,13 +6,22 @@
 
  
   <link rel="stylesheet" href="./application.css">
+    <link rel="stylesheet" href="./barchart.css">
 </head>
 <body>
 	<h1>Earthquakes in The Netherlands since 1986</h1>
 
 	<div id="credits">Data visualisation by Rick van Gemert and Bouke Regnerus, <a href="https://github.com/regnerus/data-visualisation#readme">About and Data Sources</a></div>
 
-	<div id="legend"></div>
+    <div class="container">
+        <div class="barGraph">
+            <header>Number of Earthquakes per Magnitude Range</header>
+            <svg id="barchart" width="400" height="200"></svg>
+        </div>
+    </div>
+
+
+    <div id="legend"></div>
 	
 	<div id="map" class="dark"></div>
 	<div id="brush" class="ui-brush"></div>
