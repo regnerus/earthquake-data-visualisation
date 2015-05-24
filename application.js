@@ -34,7 +34,7 @@ var tooltip_earthquake = d3.select("body")
         .attr("class", "tooltip tooltip--earthquake")
         .style("opacity", 0);
 
-var main, map, data;
+var main, map, data, brush;
 
 function init() {
 
@@ -57,7 +57,7 @@ function init() {
                                 'earthquakes'   : main.append("g").attr("id", "earthquakes"),
                             }
 
-    var brush               = d3.select('#brush').append('svg')
+        brush               = d3.select('#brush').append('svg')
                                 .attr('height', 100)
                                 .append('g');
 
@@ -77,6 +77,7 @@ function init() {
 
 window.onresize = function(event) {
     draw();
+    setBrush(data.earthquakes, brush);
 };
 
 function draw() {
