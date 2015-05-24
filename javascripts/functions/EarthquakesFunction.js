@@ -6,11 +6,11 @@ function drawEarthquakes(dataset, map) {
         .range(range(1, 10))
         .domain([0, 5]);
 
-    var colourScale = d3.scale.linear()
+    var colourScale = d3.scale.sqrt()
         .range([0, 1])
         .domain([0, 5]);
 
-    var fillOpacity = d3.scale.linear()
+    var fillOpacity = d3.scale.sqrt()
         .range([0, .5])
         .domain([0, 5]);
                     

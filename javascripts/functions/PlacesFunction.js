@@ -3,17 +3,17 @@ function drawPlaces(dataset, map) {
     // get any existing circles
     var places = map.selectAll("circle").data(dataset)
     
-    var radius = d3.scale.linear()
-        .range(range(2, 15))
-        .domain([1000, 1000000]);
+    var radius = d3.scale.sqrt()
+        .range(range(2, 10))
+        .domain([1000, 800000]);
 
-    var colourScale = d3.scale.linear()
+    var colourScale = d3.scale.sqrt()
         .range([0, 1])
-        .domain([1000, 1000000]);
+        .domain([1000, 800000]);
 
-    var fillOpacity = d3.scale.linear()
+    var fillOpacity = d3.scale.sqrt()
         .range([.50, .75])
-        .domain([1000, 1000000]);
+        .domain([1000, 800000]);
                     
     var colourInterpolator = d3.interpolateHsl("#49BCEF", "#1E6787");
                    //colours can be specified as any CSS colour string
