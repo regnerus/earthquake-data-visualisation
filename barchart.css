@@ -1,0 +1,44 @@
+.container {
+    position: absolute;
+    left: 20px;
+    bottom: 120px;
+    padding: 10px 40px;
+    background: rgba(255,255,255, .8);
+    border: 1px dashed lightgray;
+    z-index: 10;
+}
+
+.barGraph {
+    float: left;
+}
+
+.filters {
+    float: right;
+}
+
+header {
+    height: 48px;
+    line-height: 48px;
+    text-align: center;
+}
+
+.axis path, .axis line
+{
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
+}
+
+.axis text
+{
+    font-family: 'Arial';
+    font-size: 13px;
+}
+.tick
+{
+    stroke-dasharray: 1, 2;
+}
+.bar
+{
+    fill: FireBrick;
+}

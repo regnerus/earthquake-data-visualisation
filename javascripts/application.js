@@ -88,9 +88,15 @@ function draw() {
 
     drawGasfields(data.gasfields, map.gasfields);
 
+<<<<<<< HEAD
     drawBoreholes(data.boreholes.filter(function(d) {
         return new Date(d.properties.end_date) > new Date('1986-01-01T00:00:00Z');
     }), map.boreholes);
+=======
+    drawBoreholes(data.boreholes, map.boreholes);
+
+    console.log(data.earthquakes);
+>>>>>>> 1dc1bccd1b57f61fc2b9d7d4d65700278d6664c9
 }
 
 queue()
