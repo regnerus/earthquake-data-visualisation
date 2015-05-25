@@ -75,12 +75,27 @@ function updateBarChart(data) {
         .attr("class", "bar")
         .attr("x", function(d) { return xRange(d.x); })
         .attr("y", function(d) { return yRange(d.y); })
+        .attr("height", 0)
+        .attr("width",xRange.rangeBand())
+        .style("fill", "#F88180")
+        .style("fill-opacity", 0)
+        .transition()
+        // .delay(function(d, i) {
+        //     return i / barData.length * 2000;
+        // })
+        // .duration(1000)
+        .style("fill-opacity", .5)
         .attr("height", function(d) { return ((HEIGHT - MARGINS.bottom) - yRange(d.y)); })
-        .attr("width",xRange.rangeBand());
+        
 // removed data:
-    bar.exit().remove();
+    bar.exit()
+    .transition()
+        .attr("height", 0)
+        .style("fill-opacity", 0)
+        .remove();
 // updated data:
     bar
+    	.transition()
         .attr("y", function(d) { return  yRange(d.y); })
         .attr("height", function(d) { return ((HEIGHT - MARGINS.bottom) - yRange(d.y)); });
 }
@@ -152,6 +167,7 @@ function drawBarChart(data) {
         .attr('transform', 'translate(' + (MARGINS.left) + ',0)')
         .call(yAxis);
 
+
     vis.selectAll('rect')
         .data(barData)
         .enter()
@@ -163,20 +179,30 @@ function drawBarChart(data) {
             return yRange(d.y);
         })
         .attr('width', xRange.rangeBand())
+
         .attr('height', function (d) {
             return ((HEIGHT - MARGINS.bottom) - yRange(d.y));
         })
-        .attr('fill', 'grey')
-        .on('mouseover',function(d){
-            if(clickedBar != this) {
-                d3.select(this)
-                    .attr('fill','orange');
-            }
+        .attr("width",xRange.rangeBand())
+        .style("fill", "#F88180")
+        .style("fill-opacity", 0)
+        .transition()
+        .delay(function(d, i) {
+            return i / barData.length * 2000;
         })
-        .on('mouseout',function(d){
-            if(clickedBar != this) {
-                d3.select(this)
-                    .attr('fill','grey');
-            }
-        });
+        .duration(1000)
+        .style("fill-opacity", .75);
+        
+        // .on('mouseover',function(d){
+        //     // if(clickedBar != this) {
+        //     //     d3.select(this)
+        //     //         .attr('fill','orange');
+        //     // }
+        // })
+        // .on('mouseout',function(d){
+        //     // if(clickedBar != this) {
+        //     //     d3.select(this)
+        //     //         .attr('fill','grey');
+        //     // }
+        // });
 }

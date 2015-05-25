@@ -72,7 +72,6 @@ function init() {
 
 window.onresize = function(event) {
     draw();
-    setBrush(data.earthquakes, brush);
 };
 
 function draw() {
