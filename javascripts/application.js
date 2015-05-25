@@ -55,7 +55,7 @@ function init() {
                                 .attr('height', 100)
                                 .append('g');
 
-    setBrush(data.earthquakes, brush);
+    setBrush(data.earthquakes, brush, data.gasfields, data.boreholes);
 
     var legend = new Legend('#legend', [
       {color: "rgba(198, 60, 9, .50)", label: "Earthquakes", rounded: true},
@@ -88,7 +88,9 @@ function draw() {
 
     drawGasfields(data.gasfields, map.gasfields);
 
-    drawBoreholes(data.boreholes, map.boreholes);
+    drawBoreholes(data.boreholes.filter(function(d) {
+        return new Date(d.properties.end_date) > new Date('1986-01-01T00:00:00Z');
+    }), map.boreholes);
 }
 
 queue()

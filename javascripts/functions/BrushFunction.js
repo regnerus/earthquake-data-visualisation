@@ -1,4 +1,4 @@
-function setBrush(dataset, svg) {
+function setBrush(dataset, svg, gasfields, boreholes) {
     var timeExtent = d3.extent(dataset, function(d) {
         return new Date(d.properties.date);
     });
@@ -14,7 +14,7 @@ function setBrush(dataset, svg) {
         .domain([0, 5]);
 
     var fillOpacity = d3.scale.sqrt()
-        .range([0, .5])
+        .range([0, .2])
         .domain([0, 5]);
 
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
@@ -119,6 +119,7 @@ function setBrush(dataset, svg) {
             return fillOpacity(Math.abs(d.properties.mag));
         });
 
+
     svg.append('g')
         .attr('class', 'x brush')
         .call(brush)
@@ -146,23 +147,26 @@ function setBrush(dataset, svg) {
         else {
             // Otherwise, restrict features to only things in the brush extent.
             filterEarthquakes = function(feature) {
-                return new Date(feature.properties.date) > +brush.extent()[0] &&
+                return new Date(feature.properties.date) > (+brush.extent()[0]) &&
                     new Date(feature.properties.date) < (+brush.extent()[1]);
             };
 
             filterGasfield = function(feature) {
-                return new Date(feature.properties.production) > +brush.extent()[1];
+                return new Date(feature.properties.production) <= (+brush.extent()[1]);
             };
 
             filterBoreholes = function(feature) {
-                return new Date(feature.properties.start_date) >= +brush.extent()[0];
+                return new Date(feature.properties.start_date) <= (+brush.extent()[1]) && 
+                new Date(feature.properties.end_date) >= (+brush.extent()[0]);
             };
         }
 
         data.earthquakes = dataset.filter(filterEarthquakes);
-        // data.gasfields = data.gasfields.filter(filterGasfield);
-        // data.boreholes = data.boreholes.filter(filterBoreholes);
+        data.gasfields = gasfields.filter(filterGasfield);
+        data.boreholes = boreholes.filter(filterBoreholes);
 
         drawEarthquakes(data.earthquakes, map.earthquakes);
+        drawGasfields(data.gasfields, map.gasfields);
+        drawBoreholes(data.boreholes, map.boreholes);
     }
 }

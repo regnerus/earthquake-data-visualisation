@@ -16,6 +16,10 @@ body {
 	line-height: 1.5;
 }
 
+a {
+	color: rgb(73, 188, 239);
+}
+
 h1 {
 	text-align: center;
 	font-weight: 400;
@@ -34,6 +38,7 @@ h1 {
 	position: absolute;
 	left: 20px;
 	bottom: 120px;
+	color: gray;
 }
 
 #about {

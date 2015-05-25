@@ -61,7 +61,7 @@ function init() {
                                 .attr('height', 100)
                                 .append('g');
 
-    setBrush(data.earthquakes, brush);
+    setBrush(data.earthquakes, brush, data.gasfields, data.boreholes);
 
     var legend = new Legend('#legend', [
       {color: "rgba(198, 60, 9, .50)", label: "Earthquakes", rounded: true},
@@ -94,7 +94,9 @@ function draw() {
 
     drawGasfields(data.gasfields, map.gasfields);
 
-    drawBoreholes(data.boreholes, map.boreholes);
+    drawBoreholes(data.boreholes.filter(function(d) {
+        return new Date(d.properties.end_date) > new Date('1986-01-01T00:00:00Z');
+    }), map.boreholes);
 }
 
 queue()
@@ -149,9 +151,9 @@ function drawBoreholes(dataset, map) {
     // get any existing circles
     var boreholes = map.selectAll("circle").data(dataset)
 
-    var radius = d3.scale.linear()
-        .range(range(1, 1))
-        .domain([1, 1]);
+    // var radius = d3.scale.linear()
+    //     .range(range(1, 1))
+    //     .domain([1, 1]);
 
     boreholes.enter()
         .append("circle")
@@ -161,19 +163,15 @@ function drawBoreholes(dataset, map) {
         .attr("cy", function(d) {
             return xy(d.geometry.coordinates)[1]
         })
-        .attr("r", function(d) {
-            return 0;
-        })
+        // .attr("r", 0)
         .style("fill", "black")
         .style("fill-opacity", 0)
-        .transition()
-        .delay(function(d, i) {
-            return i / dataset.length * 1000;
-        })
-        .duration(1000)
-        .attr("r", function(d) {
-            return radius(1);
-        })
+        // .transition()
+        // .delay(function(d, i) {
+        //     return i / dataset.length * 1000;
+        // })
+        // .duration(1000)
+        .attr("r", 1)
         .style("fill-opacity", 0.25);
 
     // remove circles for old earthquakes no longer in data
@@ -183,7 +181,7 @@ function drawBoreholes(dataset, map) {
         .style("fill-opacity", 0)
         .remove();
 };
-function setBrush(dataset, svg) {
+function setBrush(dataset, svg, gasfields, boreholes) {
     var timeExtent = d3.extent(dataset, function(d) {
         return new Date(d.properties.date);
     });
@@ -199,7 +197,7 @@ function setBrush(dataset, svg) {
         .domain([0, 5]);
 
     var fillOpacity = d3.scale.sqrt()
-        .range([0, .5])
+        .range([0, .2])
         .domain([0, 5]);
 
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
@@ -304,6 +302,7 @@ function setBrush(dataset, svg) {
             return fillOpacity(Math.abs(d.properties.mag));
         });
 
+
     svg.append('g')
         .attr('class', 'x brush')
         .call(brush)
@@ -331,24 +330,27 @@ function setBrush(dataset, svg) {
         else {
             // Otherwise, restrict features to only things in the brush extent.
             filterEarthquakes = function(feature) {
-                return new Date(feature.properties.date) > +brush.extent()[0] &&
+                return new Date(feature.properties.date) > (+brush.extent()[0]) &&
                     new Date(feature.properties.date) < (+brush.extent()[1]);
             };
 
             filterGasfield = function(feature) {
-                return new Date(feature.properties.production) > +brush.extent()[1];
+                return new Date(feature.properties.production) <= (+brush.extent()[1]);
             };
 
             filterBoreholes = function(feature) {
-                return new Date(feature.properties.start_date) >= +brush.extent()[0];
+                return new Date(feature.properties.start_date) <= (+brush.extent()[1]) && 
+                new Date(feature.properties.end_date) >= (+brush.extent()[0]);
             };
         }
 
         data.earthquakes = dataset.filter(filterEarthquakes);
-        // data.gasfields = data.gasfields.filter(filterGasfield);
-        // data.boreholes = data.boreholes.filter(filterBoreholes);
+        data.gasfields = gasfields.filter(filterGasfield);
+        data.boreholes = boreholes.filter(filterBoreholes);
 
         drawEarthquakes(data.earthquakes, map.earthquakes);
+        drawGasfields(data.gasfields, map.gasfields);
+        drawBoreholes(data.boreholes, map.boreholes);
     }
 };
 function drawEarthquakes(dataset, map) {
@@ -364,7 +366,7 @@ function drawEarthquakes(dataset, map) {
         .domain([0, 5]);
 
     var fillOpacity = d3.scale.sqrt()
-        .range([0, .5])
+        .range([0, .2])
         .domain([0, 5]);
                     
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");

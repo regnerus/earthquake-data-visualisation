@@ -11,7 +11,7 @@ function drawEarthquakes(dataset, map) {
         .domain([0, 5]);
 
     var fillOpacity = d3.scale.sqrt()
-        .range([0, .5])
+        .range([0, .2])
         .domain([0, 5]);
                     
     var colourInterpolator = d3.interpolateHsl("#C63C09", "#F88180");
