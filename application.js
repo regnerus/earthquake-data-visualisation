@@ -354,14 +354,11 @@ function setBrush(dataset, svg, gasfields, boreholes) {
         data.boreholes = boreholes.filter(filterBoreholes);
 
         drawEarthquakes(data.earthquakes, map.earthquakes);
-<<<<<<< HEAD
         drawGasfields(data.gasfields, map.gasfields);
         drawBoreholes(data.boreholes, map.boreholes);
-=======
 
         //TODO add to brushfunction.js
         updateBarChart(data.earthquakes);
->>>>>>> 1dc1bccd1b57f61fc2b9d7d4d65700278d6664c9
     }
 };
 function drawEarthquakes(dataset, map) {
