@@ -168,5 +168,7 @@ function setBrush(dataset, svg, gasfields, boreholes) {
         drawEarthquakes(data.earthquakes, map.earthquakes);
         drawGasfields(data.gasfields, map.gasfields);
         drawBoreholes(data.boreholes, map.boreholes);
+
+        updateBarChart(data.earthquakes);
     }
 }

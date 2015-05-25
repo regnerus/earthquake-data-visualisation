@@ -3,7 +3,8 @@ var height              = window.screen.height;
 
 var xy                  = d3.geo.mercator()
                             .scale(8000)
-                            .translate([width/2, height/2])
+                            // .translate([width/2, height/2])
+                            .translate([width/1.5, height/1.6])
                             .center([5.8,52]);
 
 var scale               = 1;
@@ -80,6 +81,8 @@ function draw() {
         main.select('#' + name).selectAll("*").remove();
     }
 
+    drawBarChart(data.earthquakes);
+
     drawEarthquakes(data.earthquakes, map.earthquakes);
 
     drawPlaces(data.places.filter(function(d) {
@@ -88,15 +91,9 @@ function draw() {
 
     drawGasfields(data.gasfields, map.gasfields);
 
-<<<<<<< HEAD
     drawBoreholes(data.boreholes.filter(function(d) {
         return new Date(d.properties.end_date) > new Date('1986-01-01T00:00:00Z');
     }), map.boreholes);
-=======
-    drawBoreholes(data.boreholes, map.boreholes);
-
-    console.log(data.earthquakes);
->>>>>>> 1dc1bccd1b57f61fc2b9d7d4d65700278d6664c9
 }
 
 queue()
